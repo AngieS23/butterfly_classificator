@@ -1,9 +1,8 @@
-import torch
 import torch.nn as nn
 import torch.nn.functional as functional
 
 class ConvNet(nn.Module):
-    def __init__(self, in_channels, num_classes=4):
+    def __init__(self, in_channels=1, num_classes=4):
         super(ConvNet, self).__init__()
 
         # Layers

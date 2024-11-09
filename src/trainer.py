@@ -56,16 +56,12 @@ for epoch in range(num_epochs):
 
 
 def check_accuracy(loader, model):
-    if loader.dataset.train:
-        print("Checking accuracy on training data")
-    else:
-        print("Checking accuracy on test data")
-
     num_correct = 0
     num_samples = 0
-    model.eval()  # Set the model to evaluation mode
+    model.eval()
 
-    with torch.no_grad():  # Disable gradient calculation
+    # Disable gradient calculation
+    with torch.no_grad():
         for x, y in loader:
             x = x.to(device)
             y = y.to(device)

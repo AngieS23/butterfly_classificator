@@ -18,7 +18,9 @@ class ConvNet(nn.Module):
                                  kernel_size=3, 
                                  stride=1, 
                                  padding=1)
-        self.fully_connected = nn.Linear(16 * 7 * 7, num_classes)
+        # 16 because of the out_channels of layer_2
+        # 50 x 50 because initially the image is 200 x 200 and it passes through 2 max pooling
+        self.fully_connected = nn.Linear(16 * 50 * 50, num_classes)
 
     def forward(self, x):
         x = functional.relu(self.layer_1(x)) 

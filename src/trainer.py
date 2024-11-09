@@ -6,6 +6,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.optim import Adam
 from torcheval.metrics import MulticlassAccuracy, MulticlassF1Score, MulticlassPrecision, MulticlassRecall
+from torcheval.metrics.functional import multiclass_confusion_matrix
 from torchvision import datasets, transforms
 
 def train_model(train_loader, val_loader, device):
@@ -103,6 +104,8 @@ def validate(model, loader, criterion, device, mode):
             precision_metric.update(predictions, targets)
             recall_metric.update(predictions, targets)
 
+
+
     # Compute average validation metrics for the epoch
     avg_loss = epoch_loss / len(loader)
     accuracy = accuracy_metric.compute().item()
@@ -121,6 +124,32 @@ def validate(model, loader, criterion, device, mode):
     print(f"{mode} Precision: {precision:.4f}")
     print(f"{mode} Recall: {recall:.4f}")
 
+def calculate_confusion_matrix(model, data_loader, num_classes, device, mode):
+    all_predictions = []
+    all_targets = []
+    model.eval()
+
+    with torch.no_grad():
+        for data, targets in data_loader:
+            data = data.to(device)
+            targets = targets.to(device)
+            scores = model(data)
+            predictions = scores.argmax(dim=1)
+            all_predictions.append(predictions)
+            all_targets.append(targets)
+
+    all_predictions = torch.cat(all_predictions)
+    all_targets = torch.cat(all_targets)
+
+    confusion_matrix = multiclass_confusion_matrix(
+        all_predictions, all_targets, num_classes=num_classes
+    )
+
+    print(f"{mode} Confusion Matrix:")
+    print(confusion_matrix.cpu().numpy())
+
+    return confusion_matrix
+
 
 def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -138,6 +167,12 @@ def main():
     model , criterion = train_model(train_loader=train_loader, val_loader=val_loader, device=device)
     print('\n')
     validate(model, test_loader, criterion, device, 'Testing')
+
+    # TODO(us): Validation matrix too ?
+    print('\n')
+    train_matrix = calculate_confusion_matrix(model, train_loader, 4, device, 'Training')
+    test_matrix = calculate_confusion_matrix(model, val_loader, 4, device, 'Testing')
+
 
 if __name__ == '__main__':
     main()

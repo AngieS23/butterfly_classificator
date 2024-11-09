@@ -3,6 +3,7 @@
 /data
 /preprocessed_data
 src/dataset
+/split_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

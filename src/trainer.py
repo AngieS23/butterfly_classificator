@@ -1,34 +1,34 @@
 import torch
 import torch.nn as nn
-import torchvision.datasets as datasets # TODO(us): delete this
-import torchvision.transforms as transforms
 
 from convnet import ConvNet
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.optim import Adam
+from torchvision import datasets, transforms
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using device {device}')
 
 # TODO(us): Update to our standards
-input_width = 28
-input_length = 28
+input_width = 200
+input_length = 200
 input_size = input_width * input_length
-num_classes = 10  # TODO (us): Update
+num_classes = 4
 learning_rate = 0.001
 batch_size = 64
 num_epochs = 10
 
-# TODO(us): Update to data/ and to butterflies
-train_dataset = datasets.MNIST(root="dataset/", download=True, train=True, transform=transforms.ToTensor())
-train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+train_dataset = datasets.ImageFolder(f'../split_data/train', transform=transforms.ToTensor())
+test_dataset = datasets.ImageFolder(f'../split_data/test', transform=transforms.ToTensor())
+val_dataset = datasets.ImageFolder(f'../split_data/val', transform=transforms.ToTensor())
 
-test_dataset = datasets.MNIST(root="dataset/", download=True, train=False, transform=transforms.ToTensor())
-test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 
-model = ConvNet(in_channels=1, num_classes=num_classes).to(device)
+model = ConvNet(in_channels=3, num_classes=num_classes).to(device)
 
 
 criterion = nn.CrossEntropyLoss()
@@ -45,6 +45,7 @@ for epoch in range(num_epochs):
         # Forward pass: compute the model output
         scores = model(data)
         loss = criterion(scores, targets)
+        # TODO(us): validation accuracy
 
         # Backward pass: compute the gradients
         optimizer.zero_grad()

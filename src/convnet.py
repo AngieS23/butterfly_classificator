@@ -2,31 +2,28 @@ import torch.nn as nn
 import torch.nn.functional as functional
 
 class ConvNet(nn.Module):
-    def __init__(self, in_channels=1, num_classes=4):
+    def __init__(self, in_channels=3, num_classes=4):
         super(ConvNet, self).__init__()
 
-        # Layers
-        self.layer_1 = nn.Conv2d(in_channels=in_channels, 
-                                 out_channels=8, 
-                                 kernel_size=3, 
-                                 stride=1, 
-                                 padding=1)
-        self.pool = nn.MaxPool2d(kernel_size=2, 
-                                 stride=2)
-        self.layer_2 = nn.Conv2d(in_channels=8, 
-                                 out_channels=16, 
-                                 kernel_size=3, 
-                                 stride=1, 
-                                 padding=1)
-        # 16 because of the out_channels of layer_2
-        # 50 x 50 because initially the image is 200 x 200 and it passes through 2 max pooling
-        self.fully_connected = nn.Linear(16 * 50 * 50, num_classes)
+        self.conv_1 = nn.Conv2d(in_channels=in_channels, out_channels=32, kernel_size=3, padding=1)
+        self.conv_2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3)        
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.flatten = nn.Flatten() 
+        self.fc_1 = nn.Linear(64 * 49 * 49, 128)
+        self.dropout = nn.Dropout(0.5)
+        self.fc_2 = nn.Linear(128, num_classes)
 
     def forward(self, x):
-        x = functional.relu(self.layer_1(x)) 
+        x = functional.relu(self.conv_1(x))
         x = self.pool(x)
-        x = functional.relu(self.layer_2(x))
+        
+        x = functional.relu(self.conv_2(x))
         x = self.pool(x)
-        x = x.reshape(x.shape[0], -1)
-        x = self.fully_connected(x)
+        
+        x = self.flatten(x)
+        x = functional.relu(self.fc_1(x))
+        x = self.dropout(x)
+        x = functional.softmax(self.fc_2(x), dim=1)
+        
         return x

@@ -1,6 +1,7 @@
 # Data related
 /dataset
 /data
+/preprocessed_data
 src/dataset
 
 # Byte-compiled / optimized / DLL files

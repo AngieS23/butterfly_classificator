@@ -19,10 +19,10 @@ def train_model(train_loader, val_loader, device):
     optimizer = Adam(model.parameters(), lr=learning_rate)
 
     for epoch in range(num_epochs):
-        print(f"Epoch [{epoch + 1}/{num_epochs}]")
+        print(f"\n\nEpoch [{epoch + 1}/{num_epochs}]")
         train_epoch(train_loader, val_loader, model, criterion, optimizer, device)
         
-    return model
+    return model, criterion
 
 def train_epoch(train_loader, val_loader, model, criterion, optimizer, device):
     train_accuracy_metric = MulticlassAccuracy(num_classes=4)
@@ -67,60 +67,60 @@ def train_epoch(train_loader, val_loader, model, criterion, optimizer, device):
     train_precision_metric.reset()
     train_recall_metric.reset()
 
-    print(f"Train Loss: {avg_train_loss:.4f}")
-    print(f"Train Accuracy: {train_accuracy:.4f}, Train F1 Score: {train_f1_score:.4f}, Train Precision: {train_precision:.4f}, Train Recall: {train_recall:.4f}")
-
-    validate_epoch(model, val_loader, criterion, device)
+    print(f"Training Loss: {avg_train_loss:.4f}")
+    print(f"Train Accuracy: {train_accuracy:.4f}")
+    print(f"Train F1 Score: {train_f1_score:.4f}")
+    print(f"Train Precision: {train_precision:.4f}")
+    print(f"Train Recall: {train_recall:.4f}")
+    print('\n')
+    validate(model, val_loader, criterion, device, 'Validation')
 
     
 
-def validate_epoch(model, val_loader, criterion, device):
+def validate(model, loader, criterion, device, mode):
     model.eval()
-    val_accuracy_metric = MulticlassAccuracy(num_classes=4)
-    val_f1_metric = MulticlassF1Score(num_classes=4)
-    val_precision_metric = MulticlassPrecision(num_classes=4)
-    val_recall_metric = MulticlassRecall(num_classes=4)
+    accuracy_metric = MulticlassAccuracy(num_classes=4)
+    f1_metric = MulticlassF1Score(num_classes=4)
+    precision_metric = MulticlassPrecision(num_classes=4)
+    recall_metric = MulticlassRecall(num_classes=4)
 
-    epoch_val_loss = 0
+    epoch_loss = 0
 
     with torch.no_grad():  # Disable gradient computation for validation
-        for data, targets in val_loader:
+        for data, targets in loader:
             data = data.to(device)
             targets = targets.to(device)
 
             # Forward pass
             scores = model(data)
             loss = criterion(scores, targets)
-            epoch_val_loss += loss.item()
+            epoch_loss += loss.item()
 
             # Update metrics for validation
             predictions = scores.argmax(dim=1)
-            val_accuracy_metric.update(predictions, targets)
-            val_f1_metric.update(predictions, targets)
-            val_precision_metric.update(predictions, targets)
-            val_recall_metric.update(predictions, targets)
+            accuracy_metric.update(predictions, targets)
+            f1_metric.update(predictions, targets)
+            precision_metric.update(predictions, targets)
+            recall_metric.update(predictions, targets)
 
     # Compute average validation metrics for the epoch
-    avg_val_loss = epoch_val_loss / len(val_loader)
-    val_accuracy = val_accuracy_metric.compute().item()
-    val_f1_score = val_f1_metric.compute().item()
-    val_precision = val_precision_metric.compute().item()
-    val_recall = val_recall_metric.compute().item()
+    avg_loss = epoch_loss / len(loader)
+    accuracy = accuracy_metric.compute().item()
+    f1_score = f1_metric.compute().item()
+    precision = precision_metric.compute().item()
+    recall = recall_metric.compute().item()
 
-    val_accuracy_metric.reset()
-    val_f1_metric.reset()
-    val_precision_metric.reset()
-    val_recall_metric.reset()
+    accuracy_metric.reset()
+    f1_metric.reset()
+    precision_metric.reset()
+    recall_metric.reset()
 
-    print(f"Val Loss: {avg_val_loss:.4f}")
-    print(f"Val Accuracy: {val_accuracy:.4f}, Val F1 Score: {val_f1_score:.4f}, Val Precision: {val_precision:.4f}, Val Recall: {val_recall:.4f}")
+    print(f"{mode} Loss: {avg_loss:.4f}")
+    print(f"{mode} Accuracy: {accuracy:.4f}")
+    print(f"{mode} F1 Score: {f1_score:.4f}")
+    print(f"{mode} Precision: {precision:.4f}")
+    print(f"{mode} Recall: {recall:.4f}")
 
-    
-def evaluate_model(model, train_loader, test_loader):
-    # TODO(us): Implement
-    # TODO(us): Add other metrics
-    # TODO(us): Add confussion matrix
-    pass
 
 def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -135,8 +135,9 @@ def main():
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-    model = train_model(train_loader=train_loader, val_loader=val_loader, device=device)
-    evaluate_model(model=model, train_loader=train_loader, test_loader=test_loader)
+    model , criterion = train_model(train_loader=train_loader, val_loader=val_loader, device=device)
+    print('\n')
+    validate(model, test_loader, criterion, device, 'Testing')
 
 if __name__ == '__main__':
     main()

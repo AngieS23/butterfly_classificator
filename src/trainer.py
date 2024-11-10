@@ -8,24 +8,57 @@ from torch.optim import Adam
 from torcheval.metrics import MulticlassAccuracy, MulticlassF1Score, MulticlassPrecision, MulticlassRecall
 from torcheval.metrics.functional import multiclass_confusion_matrix
 from torchvision import datasets, transforms
+from csv_writer import write_confusion_matrix, write_epoch_metrics, write_final_results
+
+def save_metrics(results, mode, epoch, loss, accuracy, precision, recall, f1):
+    epoch += 1
+    results.append({'mode':mode, 
+                    'epoch':epoch, 
+                    'metric':'loss',
+                    'result':loss,
+                    })
+    results.append({'mode':mode, 
+                    'epoch':epoch, 
+                    'metric':'accuracy',
+                    'result':accuracy,
+                    })
+    results.append({'mode':mode, 
+                    'epoch':epoch, 
+                    'metric':'precision',
+                    'result':precision,
+                    })
+    results.append({'mode':mode, 
+                    'epoch':epoch, 
+                    'metric':'recall',
+                    'result':recall,
+                    })
+    results.append({'mode':mode, 
+                    'epoch':epoch, 
+                    'metric':'f1',
+                    'result':f1,
+                    })
 
 def train_model(train_loader, val_loader, device):
     num_classes = 4
     learning_rate = 0.001
-    num_epochs = 10
+    num_epochs = 5
 
     model = ConvNet(in_channels=3, num_classes=num_classes).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=learning_rate)
 
+    results = []
+
     for epoch in range(num_epochs):
         print(f"\n\nEpoch [{epoch + 1}/{num_epochs}]")
-        train_epoch(train_loader, val_loader, model, criterion, optimizer, device)
+        train_epoch(train_loader, val_loader, model, criterion, optimizer, device, epoch, results)
         
+    write_epoch_metrics(results)
+
     return model, criterion
 
-def train_epoch(train_loader, val_loader, model, criterion, optimizer, device):
+def train_epoch(train_loader, val_loader, model, criterion, optimizer, device, epoch, results):
     train_accuracy_metric = MulticlassAccuracy(num_classes=4)
     train_f1_metric = MulticlassF1Score(num_classes=4)
     train_precision_metric = MulticlassPrecision(num_classes=4)
@@ -74,11 +107,13 @@ def train_epoch(train_loader, val_loader, model, criterion, optimizer, device):
     print(f"Train Precision: {train_precision:.4f}")
     print(f"Train Recall: {train_recall:.4f}")
     print('\n')
-    validate(model, val_loader, criterion, device, 'Validation')
 
+    save_metrics(results, 'train', epoch, avg_train_loss, train_accuracy, train_precision, train_recall, train_f1_score)
+
+    validate(model, val_loader, criterion, device, 'Validation', results, epoch)
     
 
-def validate(model, loader, criterion, device, mode):
+def validate(model, loader, criterion, device, mode, results=None, epoch=None):
     model.eval()
     accuracy_metric = MulticlassAccuracy(num_classes=4)
     f1_metric = MulticlassF1Score(num_classes=4)
@@ -104,8 +139,6 @@ def validate(model, loader, criterion, device, mode):
             precision_metric.update(predictions, targets)
             recall_metric.update(predictions, targets)
 
-
-
     # Compute average validation metrics for the epoch
     avg_loss = epoch_loss / len(loader)
     accuracy = accuracy_metric.compute().item()
@@ -123,6 +156,10 @@ def validate(model, loader, criterion, device, mode):
     print(f"{mode} F1 Score: {f1_score:.4f}")
     print(f"{mode} Precision: {precision:.4f}")
     print(f"{mode} Recall: {recall:.4f}")
+
+    if mode == 'Validation':
+        save_metrics(results, 'validation', epoch, avg_loss, accuracy, precision, recall, f1_score)
+
 
 def calculate_confusion_matrix(model, data_loader, num_classes, device, mode):
     all_predictions = []

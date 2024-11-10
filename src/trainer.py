@@ -17,6 +17,15 @@ def append_epoch_metrics(results, mode, epoch, metrics):
     results.append({'mode': mode, 'epoch': epoch, 'metric': 'precision', 'result': metrics[3]})
     results.append({'mode': mode, 'epoch': epoch, 'metric': 'recall', 'result': metrics[4]})
 
+def save_test_metrics(metrics):
+    results = []
+    results.append({'metric': 'loss', 'result': metrics[0]})
+    results.append({'metric': 'accuracy', 'result': metrics[1]})
+    results.append({'metric': 'f1', 'result': metrics[2]})
+    results.append({'metric': 'precision', 'result': metrics[3]})
+    results.append({'metric': 'recall', 'result': metrics[4]})
+    return results
+
 def train_model(train_loader, val_loader, device):
     num_classes = 4
     learning_rate = 0.001
@@ -120,8 +129,6 @@ def validate(model, loader, criterion, device, mode):
             precision_metric.update(predictions, targets)
             recall_metric.update(predictions, targets)
 
-
-
     # Compute average validation metrics for the epoch
     avg_loss = epoch_loss / len(loader)
     accuracy = accuracy_metric.compute().item()
@@ -163,10 +170,11 @@ def calculate_confusion_matrix(model, data_loader, num_classes, device, mode):
         all_predictions, all_targets, num_classes=num_classes
     )
 
+    matrix = confusion_matrix.cpu().numpy()
+    write_confusion_matrix(mode, matrix)
+
     print(f"{mode} Confusion Matrix:")
     print(confusion_matrix.cpu().numpy())
-
-    return confusion_matrix
 
 
 def main():
@@ -184,7 +192,10 @@ def main():
 
     model , criterion = train_model(train_loader=train_loader, val_loader=val_loader, device=device)
     print('\n')
-    validate(model, test_loader, criterion, device, 'Testing')
+
+    test_results = validate(model, test_loader, criterion, device, 'Testing')
+    results = save_test_metrics(test_results)
+    write_final_results(results)
 
     # TODO(us): Validation matrix too ?
     print('\n')

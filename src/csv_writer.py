@@ -9,7 +9,7 @@ def write_epoch_metrics(metrics):
 
 def write_final_results(metrics):
     with open('../results/final_results.csv', 'w', newline='') as csvfile:
-        fieldnames = ['mode', 'metric', 'result']
+        fieldnames = ['metric', 'result']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(metrics)

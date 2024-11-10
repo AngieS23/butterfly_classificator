@@ -28,7 +28,7 @@ def save_test_metrics(metrics):
 
 def train_model(train_loader, val_loader, device):
     num_classes = 4
-    learning_rate = 0.0001
+    learning_rate = 0.001
     num_epochs = 20
 
     model = ConvNet(in_channels=3, num_classes=num_classes).to(device)

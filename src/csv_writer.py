@@ -15,6 +15,6 @@ def write_final_results(metrics):
         writer.writerows(metrics)
 
 def write_confusion_matrix(name, matrix):
-    with open(f'../results/{name}_matrix.csv', 'w', newline='') as csvfile:
+    with open(f'../results/{name.lower()}_matrix.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(matrix)

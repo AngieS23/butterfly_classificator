@@ -29,7 +29,7 @@ def save_test_metrics(metrics):
 def train_model(train_loader, val_loader, device):
     num_classes = 4
     learning_rate = 0.0001
-    num_epochs = 35
+    num_epochs = 20
 
     model = ConvNet(in_channels=3, num_classes=num_classes).to(device)
 
@@ -49,10 +49,10 @@ def train_model(train_loader, val_loader, device):
     return model, criterion
 
 def train_epoch(train_loader, val_loader, model, criterion, optimizer, device):
-    train_accuracy_metric = MulticlassAccuracy(num_classes=4)
-    train_f1_metric = MulticlassF1Score(num_classes=4)
-    train_precision_metric = MulticlassPrecision(num_classes=4)
-    train_recall_metric = MulticlassRecall(num_classes=4)
+    train_accuracy_metric = MulticlassAccuracy(num_classes=4, average='macro')
+    train_f1_metric = MulticlassF1Score(num_classes=4, average='macro')
+    train_precision_metric = MulticlassPrecision(num_classes=4, average='macro')
+    train_recall_metric = MulticlassRecall(num_classes=4, average='macro')
 
     model.train()
     epoch_train_loss = 0 
@@ -105,10 +105,10 @@ def train_epoch(train_loader, val_loader, model, criterion, optimizer, device):
 
 def validate(model, loader, criterion, device, mode):
     model.eval()
-    accuracy_metric = MulticlassAccuracy(num_classes=4)
-    f1_metric = MulticlassF1Score(num_classes=4)
-    precision_metric = MulticlassPrecision(num_classes=4)
-    recall_metric = MulticlassRecall(num_classes=4)
+    accuracy_metric = MulticlassAccuracy(num_classes=4, average='macro')
+    f1_metric = MulticlassF1Score(num_classes=4, average='macro')
+    precision_metric = MulticlassPrecision(num_classes=4, average='macro')
+    recall_metric = MulticlassRecall(num_classes=4, average='macro')
 
     epoch_loss = 0
 

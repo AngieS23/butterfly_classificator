@@ -12,22 +12,21 @@ class ConvNet(nn.Module):
 
         self.flatten = nn.Flatten() 
         self.fc_1 = nn.Linear(128*23*23, 128)
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(0.2)
         self.fc_2 = nn.Linear(128, num_classes)
 
     def forward(self, x):
-        y = x
         x = functional.relu(self.conv_1(x))
         x = self.pool(x)
         
-        x = functional.gelu(self.conv_2(x))
+        x = functional.relu(self.conv_2(x))
         x = self.pool(x)
 
         x = functional.relu(self.conv_3(x))
         x = self.pool(x)
         
         x = self.flatten(x)
-        x = functional.gelu(self.fc_1(x))
+        x = functional.relu(self.fc_1(x))
         x = self.dropout(x)
         x = functional.softmax(self.fc_2(x), dim=1)
         

@@ -5,6 +5,7 @@ from convnet import ConvNet
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.optim import Adam
+from torch.optim import AdamW
 from torcheval.metrics import MulticlassAccuracy, MulticlassF1Score, MulticlassPrecision, MulticlassRecall
 from torcheval.metrics.functional import multiclass_confusion_matrix
 from torchvision import datasets, transforms
@@ -34,7 +35,7 @@ def train_model(train_loader, val_loader, device):
     model = ConvNet(in_channels=3, num_classes=num_classes).to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = Adam(model.parameters(), lr=learning_rate)
+    optimizer = AdamW(model.parameters(), lr=learning_rate)
 
     results = []
 

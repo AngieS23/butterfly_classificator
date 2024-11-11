@@ -7,6 +7,8 @@ src/dataset
 /test_balance
 /before_balancing
 /balanced_data
+before_balancing.zip
+balanced_data.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

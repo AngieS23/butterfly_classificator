@@ -181,9 +181,9 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f'Using device {device}')
 
-    train_dataset = datasets.ImageFolder(f'../split_data/train', transform=transforms.ToTensor())
-    test_dataset = datasets.ImageFolder(f'../split_data/test', transform=transforms.ToTensor())
-    val_dataset = datasets.ImageFolder(f'../split_data/val', transform=transforms.ToTensor())
+    train_dataset = datasets.ImageFolder(f'../balanced_data/train', transform=transforms.ToTensor())
+    test_dataset = datasets.ImageFolder(f'../balanced_data/test', transform=transforms.ToTensor())
+    val_dataset = datasets.ImageFolder(f'../balanced_data/val', transform=transforms.ToTensor())
 
     batch_size = 64
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -197,7 +197,6 @@ def main():
     results = save_test_metrics(test_results)
     write_final_results(results)
 
-    # TODO(us): Validation matrix too ?
     print('\n')
     train_matrix = calculate_confusion_matrix(model, train_loader, 4, device, 'Training')
     test_matrix = calculate_confusion_matrix(model, val_loader, 4, device, 'Testing')

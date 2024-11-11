@@ -11,7 +11,7 @@ def transform_image(img):
             transforms.RandomVerticalFlip(p=1)
         ]),
         transforms.RandomApply([
-            transforms.GaussianBlur(kernel_size=(5, 9)),
+            transforms.GaussianBlur(kernel_size=(3, 3), sigma=(0.1, 0.5))
         ], p=0.25)
     ])
     return transform(img)
@@ -40,6 +40,6 @@ def augment_images(folder_path, num_photos_needed):
     print(f"Augmented {saved_count} images to reach the desired total of {num_photos_needed} images.")
 
 
-folder_path = '../test_balance'
-num_photos_needed = 10
+folder_path = '../balanced_data/train/Siproeta_stelenes_images/'
+num_photos_needed = 1417
 augment_images(folder_path, num_photos_needed)

@@ -4,6 +4,9 @@
 /preprocessed_data
 src/dataset
 /split_data
+/test_balance
+/before_balancing
+/balanced_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

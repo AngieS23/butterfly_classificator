@@ -20,14 +20,14 @@ class ConvNet(nn.Module):
         x = functional.relu(self.conv_1(x))
         x = self.pool(x)
         
-        x = functional.relu(self.conv_2(x))
+        x = functional.gelu(self.conv_2(x))
         x = self.pool(x)
 
         x = functional.relu(self.conv_3(x))
         x = self.pool(x)
         
         x = self.flatten(x)
-        x = functional.relu(self.fc_1(x))
+        x = functional.gelu(self.fc_1(x))
         x = self.dropout(x)
         x = functional.softmax(self.fc_2(x), dim=1)
         

@@ -110,5 +110,5 @@ TODO(Luis): Add link to the colab
 
 
 ## Made by
-- Angie Solís Manzano
-- Luis David Solano Santamaría
+- [Angie Solís Manzano](https://github.com/AngieS23)
+- [Luis David Solano Santamaría](https://github.com/GoninDS) 

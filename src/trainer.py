@@ -30,7 +30,7 @@ def save_test_metrics(metrics):
 def train_model(train_loader, val_loader, device):
     num_classes = 4
     learning_rate = 0.0005
-    num_epochs = 1
+    num_epochs = 12
 
     model = ConvNet(in_channels=3, num_classes=num_classes).to(device)
 
@@ -186,7 +186,7 @@ def main():
     test_dataset = datasets.ImageFolder(f'../balanced_data/test', transform=transforms.ToTensor())
     val_dataset = datasets.ImageFolder(f'../balanced_data/val', transform=transforms.ToTensor())
 
-    batch_size = 1000
+    batch_size = 64
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
@@ -202,7 +202,7 @@ def main():
     train_matrix = calculate_confusion_matrix(model, train_loader, 4, device, 'Training')
     test_matrix = calculate_confusion_matrix(model, val_loader, 4, device, 'Testing')
 
-    torch.save(model.state_dict(), '../checkpoints/')
+    torch.save(model.state_dict(), '../checkpoints/checkpoint.pth')
 
 
 if __name__ == '__main__':

@@ -200,7 +200,7 @@ def main():
 
     print('\n')
     train_matrix = calculate_confusion_matrix(model, train_loader, 4, device, 'Training')
-    test_matrix = calculate_confusion_matrix(model, val_loader, 4, device, 'Testing')
+    test_matrix = calculate_confusion_matrix(model, test_loader, 4, device, 'Testing')
 
     torch.save(model.state_dict(), '../checkpoints/checkpoint.pth')
 

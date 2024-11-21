@@ -2,6 +2,8 @@
 
 The following project contains a ConvNet architecture implemented in `pytorch` to classify the following four types of butterflies found in Costa Rica:
 
+![Butterflies](./img/butterflies.png "Butterflies")
+
 1. Siproeta Stelenes
 2. Morpho Helenor
 3. Euptoieta Hegesia Meridania

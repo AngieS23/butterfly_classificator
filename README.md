@@ -1,4 +1,4 @@
-# **Costa Rican Butterfly Classificator**
+# **Costa Rican Butterfly Classifier**
 
 The following project contains a ConvNet architecture implemented in `pytorch` to classify the following four types of butterflies found in Costa Rica:
 
